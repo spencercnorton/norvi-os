@@ -1,0 +1,377 @@
+/* NorviTech - GTK3 surfaces: menus, and window glass. Companion to gtk4.css.
+ *
+ * PROVENANCE: this file lived unmanaged in a user's ~/.config/gtk-3.0/gtk.css
+ * (owned by no package, in no repo) until 2026-08-17. Its original header said
+ * it targeted "desktop right-click / DING" -- but DING is a GTK4 app, and no
+ * gtk-4.0/gtk.css existed, so it had been styling almost nothing. The GTK4
+ * half now exists alongside it and is where the reported surfaces actually
+ * live. This file is kept because GTK3 apps still exist; it is deliberately
+ * narrow.
+ *
+ * Token source is the NorviTech design tokens (design-tokens-v2.json):
+ * radius_px.menu 20, radius_px.compact 8, state.hover neutral. Values below
+ * were reconciled against it on import and match.
+ *
+ * Original header, kept verbatim because its reasoning is still correct:
+ *
+ * Tokens from the 2026-07-30 visual-system audit:
+ *   radii.menu       20px
+ *   radii.compact     8px
+ *   surfaces.dark_menu    rgb(45 45 50 / .22)  <- specified OVER DYNAMIC BLUR
+ *   surfaces.shadow_menu  0 8px 24px rgb(0 0 0 / .16)
+ *
+ * ponytail: alpha raised .22 -> .88. GTK has no backdrop-filter and Mutter does
+ * not expose backdrop blur for client windows, so there is no blur behind a GTK
+ * menu -- at .22 the raw wallpaper reads straight through the labels. .88 keeps
+ * the tint and a hint of translucency while staying legible. If GTK ever gains
+ * a blurred-backdrop path, drop this back to the .22 token.
+ *
+ * Scope: all GTK3 apps. GTK3 CSS has no per-application selector. In practice
+ * this is narrow -- most current apps are GTK4/libadwaita and are unaffected.
+ */
+
+menu,
+.menu,
+.context-menu {
+    background-color: rgba(45, 45, 50, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 6px;
+    color: #ffffff;
+}
+
+/* The menu's toplevel is a separate popup window with its own opaque plate;
+ * leave it square-and-transparent or it paints corners back over the radius.
+ * Same failure mode as the BMS tinted plate in styles/popup/base.css. */
+window.popup,
+window.popup.background,
+menu window.popup {
+    background-color: transparent;
+}
+
+window.popup decoration {
+    background-color: transparent;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+menu menuitem,
+.menu menuitem,
+.context-menu menuitem {
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #ffffff;
+}
+
+/* states.hover = neutral translucent fill (audit token) */
+menu menuitem:hover,
+.menu menuitem:hover,
+.context-menu menuitem:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+}
+
+menu menuitem:disabled,
+.menu menuitem:disabled {
+    color: rgba(255, 255, 255, 0.40);
+}
+
+menu separator,
+.menu separator {
+    background-color: rgba(255, 255, 255, 0.10);
+    margin: 4px 2px;
+}
+
+/* ── Window glass (GTK3 companion to gtk4.css) ────────────────────
+ *
+ * Same idea as the GTK4 rule — the window stops painting at full opacity, so
+ * whatever the app does not fill itself reads through to the blurred desktop.
+ * GTK3 needs two extra declarations that GTK4 does not, both measured on Nemo
+ * (the default file manager here, `xdg-mime query default inode/directory`):
+ *
+ * 1. The window background is NOT drawn under the title bar. With only the
+ *    window rule, the title bar went fully transparent — measured mean 233
+ *    over a white page behind, i.e. the raw backdrop, with the title text and
+ *    window buttons illegible. So the title bar carries the alpha itself.
+ *
+ * 2. Menu bars and tool bars DO paint their own fill in Yaru (measured 44
+ *    against the window's 39), so without clearing them the chrome came out as
+ *    a glass title bar above an opaque band. They are cleared to `transparent`
+ *    and NOT given 0.72 — they sit on the window, and 0.72 over 0.72
+ *    composites to 92%, the seam Helios measured. Alpha on exactly one node
+ *    per region. Verified: title bar 99.3 vs tool bar 97.4 against the same
+ *    backdrop, i.e. no double-composite.
+ *
+ * `background-image: none` is required as well as the colour — Adwaita/Yaru
+ * paint these surfaces with a gradient, which a background-color alone leaves
+ * sitting on top.
+ *
+ * ponytail: `.toolbar` is a broad selector — GTK3 also uses it for inline
+ * toolbars inside file choosers and sidebars, which will show their parent's
+ * fill rather than the desktop. Same colour family, cosmetic. Narrow it if one
+ * ever looks wrong.
+ */
+/* `:not(.desktopwindow)` EXCLUDES THE DESKTOP ITSELF. DING is GTK3, not GTK4 --
+ * app/ding.js:21 sets `imports.gi.versions.Gtk = '3.0'`, the running process
+ * maps libgtk-3.so.0, and app/desktopManager.js:226 calls the GTK3-only
+ * Gtk.StyleContext.add_provider_for_screen. So DING is reached by THIS file.
+ * Its desktop window is maximized over the whole work area and is the one
+ * window with nothing behind it but the wallpaper, so glass there is not
+ * translucency, it is a scrim on the desktop: measured 0.278*wallpaper + 31,
+ * i.e. 72% of #2b2b2b, dropping saturation 0.667 -> 0.252. The giveaway is that
+ * the overview stays vivid, because DING is not drawn there. DING tags the
+ * window in desktopGrid.js:53 (`add_class('desktopwindow')`) so it can be left
+ * transparent, and its own stylesheet.css does exactly that -- this file was
+ * overriding it at USER priority. */
+window.background:not(.desktopwindow) {
+    background-color: alpha(@theme_bg_color, 0.72);
+}
+
+/* No top bar, in either state. The window rule above does not reach under the
+ * title bar in GTK3 (measured: with only the window rule the title bar went to
+ * the raw backdrop, mean 233, buttons illegible), so the title bar has to carry
+ * the same 0.72 itself to read as continuous with the window rather than as a
+ * band sitting on it. Menu bars and tool bars DO paint their own fill in Yaru
+ * (44 against the window's 39) and are cleared to `transparent`, never given
+ * 0.72 — they already sit on the window, and 0.72 over 0.72 composites to 92%
+ * and bands. Alpha on exactly one node per region.
+ *
+ * An earlier pass made this whole band opaque on focus to stop the tool-bar
+ * buttons clashing. That fixed the buttons by growing exactly the top bar the
+ * gold standard has none of, so it is reverted and the buttons are dealt with
+ * where they actually live — see `Tool-bar buttons` below.
+ */
+headerbar, .titlebar {
+    background-image: none;
+    background-color: alpha(@theme_bg_color, 0.72);
+}
+
+/* The forked Nemo's title bar is a box holding one header bar per column, so
+ * the navigation column's fill reaches the window's top edge (a layout the
+ * stock, server-decorated Nemo cannot have). The BOX must paint nothing: each
+ * header bar inside it already carries its own single layer — .sidebar solid on
+ * the left, the 0.72 above on the right — and letting the box paint too would
+ * composite 0.72 over 0.72 = 92% on the content side, banding against the tool
+ * bar under it. Alpha on exactly one node per region, as everywhere else here.
+ * Higher specificity than the rule above, and same provider, so it wins. */
+.norvi-titlebar.titlebar {
+    background-image: none;
+    background-color: transparent;
+}
+
+/* Yaru puts a 1px border on BOTH the title bar and a header bar, and they
+ * stack: probed with a 4px red/green pair, the box's line sits directly under
+ * the header bars'. Together they are one dark rule spanning the whole window
+ * under the chrome — the visual definition of the top bar this design has none
+ * of, and on the side pane it cuts the solid column 1px from its top edge.
+ *
+ * `border-width`, not `border-bottom-width`: with only the bottom cleared, the
+ * SIDE borders survived and the seam between the two header bars drew a dark
+ * vertical at the column's edge — measured 24 against the column's 92, and 1px
+ * off the light hairline the pane divider draws below it, so the two read as a
+ * broken line rather than one. */
+.norvi-titlebar.titlebar,
+.norvi-titlebar headerbar {
+    border-width: 0;
+    box-shadow: none;
+}
+
+/* The tool bar now lives inside that header bar, and Yaru gives
+ * `.primary-toolbar` a bottom border of its own — which lands exactly where the
+ * header bars' used to, so removing theirs alone just handed the seam to it.
+ * Scoped to `.nemo-window`, like the button rules below. */
+.nemo-window toolbar,
+.nemo-window .primary-toolbar {
+    border-width: 0;
+    box-shadow: none;
+}
+
+/* In :backdrop the column hands itself back to the window's glass — but GTK3
+ * does not paint the window background under the title bar, so clearing the
+ * side pane's header to `transparent` (as .sidebar:backdrop does below) drops it
+ * to the RAW backdrop: measured 84 against the column's 55, a bright step across
+ * the top of the column. It carries the window's own 0.72 instead, which is the
+ * one value the rest of the column is already showing. */
+.nemo-window .norvi-titlebar headerbar.sidebar:backdrop {
+    background-color: alpha(@theme_bg_color, 0.72);
+}
+
+menubar, toolbar, .toolbar {
+    background-image: none;
+    background-color: transparent;
+}
+
+/* ── File manager panes (Nemo) ────────────────────────────────────
+ *
+ * The window rule above stops the *window* painting; it does not reach the
+ * panes. Measured under Xvfb with the exact stylesheet above, the glass ended
+ * at the toolbar: chrome read 31 (= 0.72 x #2c2c2c), everything below it read
+ * a flat 39 (#272727) — an opaque slab over ~95% of the window.
+ *
+ * A diagnostic pass named the owners, and there are two, stacked:
+ *   `.view`     @theme_base_color #272727 — the places sidebar as
+ *               `treeview.view`, the file area as Nemo's own canvas (which
+ *               carries `.view` but is NOT a GtkIconView, so `iconview` never
+ *               matches).
+ *   `.sidebar`  @theme_bg_color   #2c2c2c — a SECOND opaque layer beneath the
+ *               sidebar's treeview, invisible until the view on top of it is
+ *               cleared. Clearing only `.view` moved the sidebar 39 -> 44 while
+ *               the file area went to 31. Both have to go.
+ * `placessidebar` never matches — that is a GtkPlacesSidebar and Nemo has none.
+ *
+ * Cleared to `transparent`, not given their own alpha: they sit on the window,
+ * so the single 0.72 already covers them, and a second alpha composites to 92%
+ * and bands — the seam Helios measured, and the same reason menubar/toolbar
+ * above are cleared rather than tinted. Alpha on exactly one node per region.
+ * Adding no new alpha is also what keeps check_contrast.py's verdict on 0.72
+ * binding for every label in these panes.
+ *
+ * `:not(:selected)` IS LOAD-BEARING. A user stylesheet beats the theme at equal
+ * specificity, so a bare `.nemo-window .view` also matches the node while it is
+ * selected and erased Yaru's selection fill: measured, the accent pill
+ * #7460D4 vanished and a selected file was indistinguishable from an
+ * unselected one, with only the status bar saying anything was selected.
+ *
+ * Scoped to `.nemo-window` (verified present on the toplevel). A bare `.view`
+ * rule would strip the base out of every GTK3 text view and list on the box.
+ */
+.nemo-window .view:not(:selected),
+.nemo-window statusbar {
+    background-color: transparent;
+}
+
+/* The places sidebar is the GTK3 counterpart of the solid navigation column in
+ * the reference: one opaque run from the top of the window to the bottom while
+ * focused, glass when not. The treeview on top of it stays transparent (above),
+ * so clearing `.sidebar` in `:backdrop` is enough to hand the whole column back
+ * to the window's 0.72 — no second alpha, and the tool bar above it is already
+ * transparent, so the column reads unbroken from the chrome down. */
+.nemo-window .sidebar {
+    background-color: @theme_bg_color;
+}
+
+.nemo-window .sidebar:backdrop {
+    background-color: transparent;
+}
+
+/* The navigation column is the primary way around the file manager, so its rows
+ * are sized to be read and hit, not to pack: measured, `larger` takes the row
+ * pitch from 26px to 33px and the text grows with it. `larger` is 1.2x the
+ * inherited font, so this follows the desktop font setting instead of pinning a
+ * point size, and `.sidebar` is the column box, so it covers the tree side pane
+ * as well as places.
+ *
+ * This lives here rather than in the fork's own gresource stylesheet because
+ * the fork's provider does not reach the cell renderers' font — probed both
+ * ways, `font-size: larger` at USER priority moves the pitch and the same rule
+ * at APPLICATION priority does not. It is also tunable here without a rebuild.
+ */
+.nemo-window .sidebar treeview.view {
+    font-size: larger;
+}
+
+/* Yaru draws the pane divider as a 1px image(#181818). Against two glass panes
+ * that reads as a black crack rather than a seam; this is the same hairline the
+ * menus above use. */
+.nemo-window paned > separator {
+    background-image: image(rgba(255, 255, 255, 0.08));
+}
+
+/* The window has to terminate somewhere now that the status bar no longer
+ * paints a fill of its own. */
+.nemo-window statusbar {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Stock Yaru paints selection as a square, full-bleed accent bar. Rounded to
+ * radius_px.compact so a selected row reads like a hovered menu item. Left
+ * fully opaque on purpose: this is the one surface in the window where text
+ * does NOT sit on the 0.72 window glass, so tinting it would put it outside
+ * what check_contrast.py has verified. */
+.nemo-window .view:selected,
+.nemo-window .view:selected:focus {
+    border-radius: 8px;
+}
+
+/* ...but NOT in the places side pane. GtkTreeView renders a row's background
+ * once PER COLUMN, so a radius there cut the selection into four rounded blobs
+ * with notches between them — expander pad, expander, primary, eject — measured
+ * as four separate runs of the accent across one selected row. The forked Nemo
+ * draws that row as a single pill instead, and this per-column paint has to go
+ * entirely or it shows through it as those same segments.
+ *
+ * Scoped to `.nemo-places-sidebar`, not `.sidebar`: the tree side pane is the
+ * other thing wearing that class and it has no pill of its own to fall back on,
+ * so clearing its selection would leave it with none at all. */
+.nemo-window .nemo-places-sidebar treeview.view:selected,
+.nemo-window .nemo-places-sidebar treeview.view:selected:focus {
+    background-color: transparent;
+    background-image: none;
+    border-radius: 0;
+}
+
+/* ── Tool-bar buttons ─────────────────────────────────────────────
+ *
+ * With the chrome back to glass, the nav arrows, breadcrumb and view switcher
+ * are the problem again: Yaru gives them an opaque fill and a hard border, so
+ * against a translucent band they read as dark slabs floating on the desktop —
+ * "no glass effect or lighter colour at all, too much contrast".
+ *
+ * They are re-cut as a translucent white wash instead: the same
+ * `state.hover neutral` token the menus above already use, so a tool-bar button
+ * and a hovered menu item are the same material. A wash over the band composites
+ * with the band rather than covering it, which is what makes the button read as
+ * part of the glass instead of on top of it.
+ *
+ * Every interactive state is declared, and that is load-bearing rather than
+ * completeness for its own sake: a user stylesheet beats the theme at equal
+ * specificity, and these selectors are MORE specific, so a bare rule would win
+ * in the hover and checked states too and flatten them to the resting fill —
+ * the same trap that erased Yaru's selection colour when `.view` was cleared
+ * without `:not(:selected)`. Declaring them keeps the affordance.
+ *
+ * No new alpha over text: these are chrome, and the labels on them sit on the
+ * same 0.72 band check_contrast.py already governs.
+ *
+ * ponytail: scoped to `.nemo-window` so this cannot reach a GTK3 app that looks
+ * fine. Widen it if a second GTK3 app shows the same slabs.
+ */
+.nemo-window toolbar button,
+.nemo-window .toolbar button,
+.nemo-window .primary-toolbar button,
+.nemo-window .path-bar button,
+.nemo-window headerbar button {
+    background-image: none;
+    background-color: alpha(@theme_fg_color, 0.08);
+    border-color: alpha(@theme_fg_color, 0.10);
+    box-shadow: none;
+}
+
+.nemo-window toolbar button:hover,
+.nemo-window .toolbar button:hover,
+.nemo-window .primary-toolbar button:hover,
+.nemo-window .path-bar button:hover,
+.nemo-window headerbar button:hover {
+    background-color: alpha(@theme_fg_color, 0.16);
+}
+
+.nemo-window toolbar button:checked,
+.nemo-window toolbar button:active,
+.nemo-window .toolbar button:checked,
+.nemo-window .toolbar button:active,
+.nemo-window .primary-toolbar button:checked,
+.nemo-window .primary-toolbar button:active,
+.nemo-window .path-bar button:checked,
+.nemo-window .path-bar button:active,
+.nemo-window headerbar button:checked,
+.nemo-window headerbar button:active {
+    background-color: alpha(@theme_fg_color, 0.24);
+}
+
+.nemo-window toolbar button:disabled,
+.nemo-window .toolbar button:disabled,
+.nemo-window .primary-toolbar button:disabled,
+.nemo-window .path-bar button:disabled,
+.nemo-window headerbar button:disabled {
+    background-color: alpha(@theme_fg_color, 0.03);
+    border-color: alpha(@theme_fg_color, 0.05);
+}

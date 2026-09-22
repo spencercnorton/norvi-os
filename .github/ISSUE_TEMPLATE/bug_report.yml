@@ -1,0 +1,53 @@
+name: Bug report
+description: The boot splash, the login screen, the About logo or the window glass does not behave as documented.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please remove machine names, user names and personal paths from anything you paste.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what happened instead.
+      placeholder: After running install.sh and rebooting, the boot splash was still Ubuntu's.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. sudo ./install.sh on a fresh Ubuntu 26.04 desktop
+        2. Reboot
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: ["Boot splash (Plymouth)", "Login screen (GDM)", "Settings → About logo", "Window glass (GTK stylesheet)", "Blur my Shell settings", "Install or uninstall", "Other / not sure"]
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: "`lsb_release -ds`, `gnome-shell --version`, and the NorviOS release you installed (`git describe --tags` in your clone)."
+      placeholder: "Ubuntu 26.04 LTS, GNOME Shell 50.1, v1.3.0"
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: Graphics
+      description: "Only for the boot splash: your GPU and driver, because the splash can only appear once there is a framebuffer."
+      placeholder: "NVIDIA, proprietary driver 580"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Installer output
+      description: "The output of the installer you ran, or `journalctl -b -u gdm` for a login-screen problem. Scrubbed."
+      render: text

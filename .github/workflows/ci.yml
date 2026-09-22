@@ -1,0 +1,32 @@
+# Checks on every pull request and on main: the glass alpha keeps primary text
+# above WCAG AA, the desktop installer's dconf-list surgery and its uninstall
+# rules hold, and the shell scripts are clean. The installers themselves change
+# boot and login configuration, so they are exercised on a virtual machine
+# before a release, not here. No secrets, read-only token, GitHub-owned actions
+# pinned by commit.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Contrast
+        run: python3 desktop/check_contrast.py
+      - name: Desktop installer rules
+        run: |
+          bash desktop/test-blacklist-merge.sh
+          bash desktop/test-uninstall-restore.sh
+      - name: Shell scripts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck -S warning install.sh uninstall.sh desktop/*.sh

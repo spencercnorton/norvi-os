@@ -1,0 +1,243 @@
+/* NorviTech — GTK4 / libadwaita surfaces: menus, and window glass.
+ *
+ * WHY THIS FILE EXISTS
+ *
+ * Right-click menus did not match the rest of the desktop, on two surfaces:
+ * the desktop background (DING) and inside application windows. Neither is a
+ * GNOME Shell `St` popup, so blur-my-shell — which styles Shell popups — never
+ * touched either one.
+ *
+ * CORRECTION (2026-08-20): an earlier version of this header claimed DING is a
+ * GTK4 app and that the GTK3 file therefore styled "almost nothing". That is
+ * wrong. DING is GTK3 -- app/ding.js:21 sets `imports.gi.versions.Gtk = '3.0'`
+ * and the process maps libgtk-3.so.0. The package depending on gir1.2-gtk-4.0
+ * says nothing about which GTK *this* app loads. DING is reached by gtk3.css,
+ * not by this file, and the window-glass rule there scrimmed the whole desktop
+ * until it was scoped off `.desktopwindow`. Verify with `grep gi.versions.Gtk`
+ * before trusting either claim again.
+ *
+ * VALUES ARE TOKENS, NOT TASTE
+ *
+ * From the NorviTech design tokens, design-tokens-v2.json (v2.0.0):
+ *
+ *   radius_px.menu     20   -> popover contents
+ *   radius_px.compact   8   -> individual menu items
+ *   state.hover    neutral  -> translucent white fill, no accent
+ *   accessibility.primary_text_minimum_contrast  4.5
+ *
+ * The tint rgb(45 45 50) and shadow `0 8px 24px rgb(0 0 0 / .16)` are the same
+ * values blur-my-shell's popup stylesheet uses, so a GTK menu and a Shell menu
+ * are the same material read from the same source.
+ *
+ * THE ONE DELIBERATE DIVERGENCE — alpha .22 becomes .88
+ *
+ * blur-my-shell specifies its .22 fill *over a dynamic blur*. GTK has no
+ * `backdrop-filter`, and Mutter does not expose backdrop blur to client
+ * windows, so there is no blur behind a GTK menu at all. At .22 the raw
+ * wallpaper reads straight through the labels and fails the 4.5:1 contrast the
+ * accessibility token requires. .88 keeps the tint and a hint of translucency
+ * while staying legible.
+ *
+ * This is a real ceiling, not a tuning choice: a GTK menu can never carry the
+ * Shell popup's blur. The goal is one design language — same tint, same radii,
+ * same shadow, with a documented reason for the alpha difference — not pixel
+ * equality with the Shell popups.
+ *
+ * ponytail: if GTK ever gains a blurred-backdrop path, drop this to the .22
+ * token and delete this paragraph.
+ *
+ * SCOPE
+ *
+ * All GTK4 apps. GTK4 CSS has no per-application selector, and libadwaita
+ * ignores full themes but does honour system/user gtk.css, which is why this
+ * reaches Adwaita apps that a theme could not.
+ */
+
+/* The popover's own plate must be transparent, or it paints an opaque square
+ * behind the rounded contents and puts the corners back. Same failure mode the
+ * GTK3 file documents for `window.popup`, and the same one blur-my-shell hits
+ * with its tinted plate in styles/popup/base.css. */
+popover,
+popover.background,
+popover.menu {
+    background-color: transparent;
+}
+
+popover > contents,
+popover.menu > contents {
+    background-color: rgba(45, 45, 50, 0.88);   /* .22 token, adapted: no blur */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;                         /* radius_px.menu */
+    padding: 6px;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* The little pointer tail inherits the plate, or it reads as a lighter notch
+ * hanging off an otherwise uniform surface. */
+popover > arrow,
+popover.menu > arrow {
+    background-color: rgba(45, 45, 50, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* GTK4 menu items are modelbutton, not menuitem. A GTK3-only rule is exactly
+ * how the previous override ended up applying to nothing. */
+popover.menu modelbutton,
+popover contents modelbutton {
+    border-radius: 8px;                          /* radius_px.compact */
+    padding: 6px 10px;
+    color: #ffffff;
+    min-height: 0;
+}
+
+/* state.hover = neutral: a translucent white wash, never the accent. The
+ * accent stays reserved for selection and focus, per the state tokens. */
+popover.menu modelbutton:hover,
+popover contents modelbutton:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+}
+
+popover.menu modelbutton:disabled,
+popover contents modelbutton:disabled {
+    color: rgba(255, 255, 255, 0.40);
+}
+
+popover.menu separator,
+popover contents separator {
+    background-color: rgba(255, 255, 255, 0.10);
+    margin: 4px 2px;
+    min-height: 1px;
+}
+
+/* Keyboard focus must stay visible against the translucent fill. The focus
+ * ring colour is `system-accent` per the state tokens, so it is deliberately
+ * NOT hardcoded here — GTK resolves it from the theme. */
+popover.menu modelbutton:focus-visible,
+popover contents modelbutton:focus-visible {
+    outline: 2px solid;                          /* state.focus_ring_width_px */
+    outline-offset: -2px;
+}
+
+/* ── Window glass ─────────────────────────────────────────────────
+ *
+ * One rule. The window stops painting its own fill at full opacity, so every
+ * region the application does not paint itself reads through to the blurred
+ * desktop behind it. Measured on GNOME 50 (GTK 4.22.4 / libadwaita
+ * 1.9.1) against stock apps, not a harness:
+ *
+ *   surface                       result
+ *   header bar                    GLASS  (Adw.ToolbarView is flat — paints nothing)
+ *   .sidebar / .navigation-sidebar GLASS in Settings, opaque where the split view
+ *                                 gives the pane its own @sidebar_bg_color fill
+ *   preferences page background   GLASS, with .boxed-list cards floating on it
+ *   .view (text, lists, canvases) OPAQUE — @view_bg_color, so prose never sits
+ *                                 over a moving desktop
+ *
+ * That last row is why this is ONE rule on the window and not a sweep over
+ * individual widgets. Helios tried the per-widget version first and shipped a
+ * build with the header bar at alpha 0.84 and the composer at 0.08 — a hole
+ * where the message box should be — because Stack, Paned, ToolbarView and
+ * ToastOverlay paint nothing and simply pass transparency down. Painting only
+ * the window inverts the burden: a surface is glass exactly when its author
+ * chose not to fill it, which is already the right answer.
+ *
+ * PREREQUISITE — this rule is HALF the effect.
+ *
+ * GTK has no backdrop-filter and Mutter does not expose backdrop blur to client
+ * windows. The blur comes from blur-my-shell's Applications component at the
+ * compositor level, and it needs BOTH:
+ *
+ *     applications.enable-all      true    (every window, not a whitelist)
+ *     applications.dynamic-opacity false   (or the blur is hidden on the FOCUSED
+ *                                           window — i.e. the one you are looking at)
+ *
+ * install-desktop.sh sets both. Without them this is translucency over a sharp
+ * wallpaper, which is precisely what "an asset is just straight up missing"
+ * described when Helios shipped that state twice.
+ *
+ * ALPHA 0.72 IS LOAD-BEARING.
+ *
+ * Worst-case WCAG contrast for primary text over the composite is 6.16:1
+ * (dark scheme, white backdrop — the bright backdrop lifts the surface toward
+ * the white text, so dark mode is the binding case, not light). Clear of the
+ * 4.5:1 accessibility token. GTK3 is tighter — Yaru light on a black backdrop
+ * gives 5.24:1 — so the fleet-wide floor is 0.67, not GTK4's own 0.63.
+ * check_contrast.py computes this for both schemes at three backdrops and
+ * asserts it — run it before changing the number.
+ *
+ * `.csd` IS LOAD-BEARING — it is what keeps Chromium out of the rule.
+ *
+ * Chromium (Brave, Chrome; both map libgtk-4.so.1 here) does not render with
+ * GTK — it SAMPLES GTK for colours it then paints itself, and
+ * `ui/gtk/gtk_color_mixers.cc` reads `kColorPrimaryBackground` off a bare
+ * window node. Every bubble-style surface derives from it: the app menu, the
+ * extensions menu, permission and dialog bubbles. Chromium assumes that colour
+ * is opaque, so an unscoped rule handed it our 0.72 and the bubbles went
+ * see-through — measured with a geolocation prompt over a text page, the page's
+ * own heading read straight through the bubble and collided with its labels.
+ * Toggling only Brave's `system_theme` between 1 (GTK) and 0 (Classic) flipped
+ * the symptom on and off with nothing else changed, which is what named GTK
+ * colour sampling as the cause rather than blur-my-shell or the popover rules.
+ *
+ * There is no per-application selector in GTK CSS, but there does not need to
+ * be: Chromium builds its sampling context from a GtkWindow it never realizes,
+ * and GTK adds `csd` in realize. Probed on GTK 4.22.4 — Chromium's context is
+ * ['background'], a real shown window is ['background','csd'], and `csd`
+ * survives both maximize and fullscreen. So this scoping is invisible to the
+ * sampler and reaches every real window it used to.
+ *
+ * The cost is that a GTK4 window WITHOUT client-side decorations gets no glass.
+ * On Wayland that is close to nothing — GTK4 never requests server-side
+ * decorations — and an undecorated window is an overlay, which should not be
+ * glass anyway.
+ *
+ * ponytail: the GTK3 file carries the same unscoped rule and the same exposure
+ * (VS Code maps libgtk-3), but is deliberately left alone — nobody has reported
+ * it, VS Code draws its own menus, and GTK3 traditional apps on X11 really are
+ * server-decorated, so `.csd` there would silently drop glass on them.
+ */
+window.background.csd {
+    background-color: alpha(@window_bg_color, 0.72);
+}
+
+/* ── Sidebar carries the focus cue; the chrome never does ─────────
+ *
+ * The gold standard is GNOME Settings: the navigation pane is one solid column
+ * from the very top of the window to the very bottom, and the content pane is
+ * glass all the way up — no title bar, no chrome band, nothing separating the
+ * header row from the content under it. Measured off the reference: content
+ * header 40.73 and the row directly beneath it 41.22, i.e. continuous to within
+ * half a level, on a smooth 40.7 -> 51.0 vertical ramp with column std ~0.1-0.4.
+ * (Flat horizontally but ramping vertically is the signature of glass over a
+ * BLURRED backdrop — the blur smears the stars out, so low variance here does
+ * not mean opaque.) The sidebar over the same span is flat 50.00, std 0.00.
+ *
+ * An earlier pass put the alpha on `headerbar:not(:backdrop)` so the chrome went
+ * solid on focus. That is the one thing this design must not do: an opaque
+ * header IS the top bar, and the reference has none. So the focus cue moves to
+ * the sidebar instead — solid while you are working in the window, glass when
+ * you are not — which keeps a visible active/inactive signal without ever
+ * growing a bar.
+ *
+ * Declaring `.sidebar` explicitly rather than relying on the split view is the
+ * point of doing it here: libadwaita only fills the sidebar in SOME layouts
+ * (measured: solid in Settings, glass wherever the split view declines to paint),
+ * so without this rule "the sidebar is solid" is true per-app rather than
+ * fleet-wide. This is what makes an arbitrary GTK4 app look like Settings.
+ *
+ * The header bars need no rule at all in either state. They are flat — they
+ * paint nothing and show whatever is behind them — so the one inside the sidebar
+ * inherits the sidebar's fill and the one over the content inherits the window's
+ * 0.72. That is exactly the reference, and it is why this is two selectors
+ * rather than a sweep: alpha still lives on exactly one node per region.
+ */
+.sidebar,
+.navigation-sidebar {
+    background-color: @sidebar_bg_color;
+}
+
+.sidebar:backdrop,
+.navigation-sidebar:backdrop {
+    background-color: transparent;
+}
