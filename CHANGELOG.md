@@ -2,6 +2,11 @@
 
 All notable changes to NorviOS are documented here.
 
+## 1.3.5 — 2026-09-23
+
+- The suite links at the foot of the README point to Indigo, the new name of
+  Swiss UI.
+
 ## 1.3.4 — 2026-09-23
 
 - The README shows how to make a drawer in the launcher: right-click, New
