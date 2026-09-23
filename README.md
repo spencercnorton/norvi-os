@@ -15,13 +15,10 @@
 </p>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/about-dark.png">
-    <img alt="GNOME Settings open at About on an Ubuntu 26.04 desktop, showing the NorviTech logo in place of Ubuntu's, with the window's content pane rendered as frosted glass over a blurred wallpaper." src="docs/screenshots/about-light.png" width="900">
-  </picture>
+  <img alt="The NorviOS desktop on Ubuntu 26.04: a transparent top bar with named workspaces on the left and the weather and clock on the right, three sticky notes pinned to the right edge, a Files window rendered as frosted glass, and a centred dock with a blurred plate at the bottom." src="docs/screenshots/desktop.png" width="900">
 </p>
 
-Captured on a fresh Ubuntu 26.04 virtual machine with a demo account and a plain gradient wallpaper; nothing personal.
+Every screenshot here was captured on a fresh Ubuntu 26.04 virtual machine with a demo account, a generated wallpaper and invented notes; nothing personal.
 
 NorviOS is the desktop the NorviTech apps are built on: stock Ubuntu 26.04 LTS
 with GNOME 50 on Wayland, rebranded from the first boot frame and restyled so
@@ -47,6 +44,13 @@ a light and a dark variant, replaces Ubuntu's two logo files through local
   <img alt="The Ubuntu login screen with the white NorviTech mark at the bottom in place of Ubuntu's logo." src="docs/screenshots/login.png" width="445">
 </p>
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/about-dark.png">
+    <img alt="GNOME Settings open at About, showing the NorviTech logo where Ubuntu's would be, in the NorviOS desktop." src="docs/screenshots/about-light.png" width="700">
+  </picture>
+</p>
+
 **Turns GTK windows to glass.** A per-user GTK3 and GTK4 stylesheet stops
 each window painting its background at full opacity, and
 [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
@@ -61,6 +65,48 @@ before changing it — a stylesheet you already had, your Blur my Shell
 settings, the blacklist entries it adds — and `--uninstall` puts back exactly
 that, and nothing that was yours.
 
+### The desktop around it
+
+The screenshots show the whole NorviOS desktop, not just what this repository
+installs. The rest is a set of GNOME Shell extensions, most of them
+NorviTech's own and several of them forks, which are **not published yet**:
+each needs its own licence and code review first. Until then this is what they
+are, so nothing on this page is a mystery.
+
+| On screen | Extension | Origin |
+|---|---|---|
+| The dock, centred at the bottom, blurred, and the app launcher that opens from it, with drawers you create from a right-click | XDock | NorviTech fork of [Dash to Dock](https://github.com/micheleg/dash-to-dock) |
+| The blur behind the dock, menus and windows, with rounded corners | Blur my Shell (Norvi build) and gnome-rounded-blur | Fork of [Blur my Shell](https://github.com/aunetx/blur-my-shell); the rounded-blur library is in the APT repository |
+| Named workspaces on the left of the top bar | Space Bar | Fork of [Space Bar](https://github.com/christopher-l/space-bar) |
+| The top bar that turns transparent over the desktop | Transparent Top Bar | Fork of [Transparent Top Bar](https://github.com/lamarios/gnome-shell-extension-transparent-top-bar) |
+| The weather in the top bar and its forecast panel | GEweather | NorviTech fork of [SimpleWeather](https://github.com/romanlefler/SimpleWeather) |
+| The clock on the right of the top bar | Move Clock | [Third-party](https://extensions.gnome.org/extension/2/move-clock/), unchanged |
+| A system menu that shows only the power button | Power-only Quick Settings | NorviTech |
+| The large clock and weather on the lock screen | Lock Screen Suite | NorviTech |
+| Per-monitor wallpapers and rotation | Wallpaper Suite | NorviTech |
+| Sticky notes that come back where you left them | [XNote](https://github.com/spencercnorton/xnote) and [XNote Placement](https://github.com/spencercnorton/xnote-placement) | NorviTech, published |
+
+<p align="center">
+  <img alt="The dock's app launcher: clicking the first dock button opens a panel with the user's name, a search field and recently used apps; All Apps fills the grid, and typing note narrows it to XNote and Text Editor before the panel closes." src="docs/screenshots/launcher.png" width="900">
+</p>
+
+<p align="center">
+  <img alt="Making a drawer in the launcher: right-clicking All Apps offers New Drawer, the name Writing is typed into the sidebar, Text Editor and XNote are dragged onto the new Writing drawer, and opening it shows just those two apps." src="docs/screenshots/drawers.png" width="600">
+</p>
+
+<p align="center">
+  <img alt="Clicking through the named workspaces in the top bar: Home with the Files window and notes, Code with a text editor, Media with an empty music folder, then back to Home. Occupied workspaces are bright, empty ones dim." src="docs/screenshots/workspaces.png" width="900">
+</p>
+
+<p align="center">
+  <img alt="The weather panel open from the top bar: current conditions, a seven-day forecast and details, on a blurred rounded menu, with its data sources credited." src="docs/screenshots/weather.png" width="445">
+  <img alt="The system menu open from the power button: volume, network, power mode, dark style and do not disturb, on the same blurred rounded material." src="docs/screenshots/quick-settings.png" width="445">
+</p>
+
+<p align="center">
+  <img alt="The NorviOS lock screen: a large clock with seconds, the date, and the current weather over a softened wallpaper." src="docs/screenshots/lock-screen.png" width="700">
+</p>
+
 **Sits under the NorviTech desktop apps**, each of which is its own
 repository:
 
@@ -71,8 +117,6 @@ repository:
 | [XNote Placement](https://github.com/spencercnorton/xnote-placement) | A GNOME Shell extension that puts each XNote note back where you left it |
 | [SnipSnap](https://github.com/spencercnorton/snipsnap) | Screenshot any region of any monitor on GNOME Wayland |
 
-The dock, workspace bar, wallpaper and weather extensions that complete the
-desktop are not published yet.
 
 ## Install
 

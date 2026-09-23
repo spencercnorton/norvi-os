@@ -2,6 +2,34 @@
 
 All notable changes to NorviOS are documented here.
 
+## 1.3.4 — 2026-09-23
+
+- The README shows how to make a drawer in the launcher: right-click, New
+  Drawer, name it, drag apps onto it.
+
+## 1.3.3 — 2026-09-23
+
+- The README shows XDock's app launcher — opening it from the dock, All Apps,
+  and search — which the earlier screenshots left out.
+
+## 1.3.2 — 2026-09-23
+
+- The workspace-switching animation shows the same glass Files window on
+  every workspace. Its Media workspace had opened an empty folder, and GNOME's
+  "Folder is Empty" page paints its own opaque background, so it looked like a
+  different theme.
+
+## 1.3.1 — 2026-09-22
+
+- The screenshots now show the whole NorviOS desktop — XDock, the Space Bar
+  workspaces, Transparent Top Bar, GEweather, the lock screen and the
+  power-only system menu — instead of a stock Ubuntu desktop with this
+  repository's branding on it. All were captured on a fresh Ubuntu 26.04
+  virtual machine with nothing personal in them.
+- The README names every extension on screen, says which are forks and of
+  what, and says plainly that they are not published yet.
+- No installer or stylesheet changed.
+
 ## 1.3.0 — 2026-09-22
 
 - First public release, on GitHub, under the name NorviOS.
