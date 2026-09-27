@@ -6,6 +6,7 @@
 # pinned by commit.
 name: CI
 on:
+  workflow_call:
   pull_request:
   push:
     branches: [main]
@@ -19,6 +20,8 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Contrast
         run: python3 desktop/check_contrast.py
       - name: Desktop installer rules

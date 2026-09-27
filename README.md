@@ -153,6 +153,9 @@ with GNOME 50 on Wayland.
 
 ## Documentation
 
+- [Deployment and operations guide](docs/OPERATIONS.md) — setup, configuration, verification, upgrades, recovery and troubleshooting.
+- [Releasing](docs/RELEASING.md) — public builds, release checks and private deployment boundaries.
+
 - [How it works](docs/how-it-works.md) — the override point behind each
   surface, why each one survives an Ubuntu update, and the measurements behind
   the glass
@@ -179,7 +182,7 @@ Nothing leaves the machine: neither installer uses the network.
 
 - Bugs and feature requests: [open an issue](https://github.com/spencercnorton/norvi-os/issues/new/choose). Questions: [Discussions](https://github.com/spencercnorton/norvi-os/discussions).
 - Security reports: [private vulnerability reporting](https://github.com/spencercnorton/norvi-os/security/advisories/new) — see [SECURITY.md](SECURITY.md). There is no e-mail address; that is deliberate.
-- Pull requests are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) first — this repository is a release mirror, and accepted changes ship in the next tagged release.
+- Pull requests are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) first — changes are reviewed and merged on GitHub, then shipped in tagged releases.
 - If NorviOS saves you time, you can [support its development](https://buy.stripe.com/8x26oH2U44f65TRe574wM04).
 
 ## Development
