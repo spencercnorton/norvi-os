@@ -10,15 +10,14 @@
 
 ## Checklist
 
-- [ ] `python3 desktop/check_contrast.py` and both `desktop/test-*.sh` scripts pass, and `shellcheck -S warning` is clean
+- [ ] `python3 desktop/check_contrast.py`, `python3 desktop/check_gtk_css.py` and the `desktop/test-*.sh` scripts pass, and `shellcheck -S warning` is clean
 - [ ] Commits are signed off (`git commit -s`, Developer Certificate of Origin)
 - [ ] No secrets, hostnames, machine names, personal data or personal paths in the diff
 - [ ] Every new change an installer makes is undone by the matching uninstall step
 - [ ] Docs updated if behaviour changed (README, `docs/how-it-works.md`, `CHANGELOG.md`)
 
 <!--
-How this lands: this repository is a release mirror. A maintainer reviews the
-pull request here, applies accepted changes to the development tree, and the
-change ships in the next tagged release — the pull request is then closed
-with a reference to that release. See CONTRIBUTING.md.
+How this lands: a maintainer reviews the pull request here and merges it
+once the required checks pass; it ships in the next tagged release. See
+CONTRIBUTING.md and docs/RELEASING.md.
 -->
