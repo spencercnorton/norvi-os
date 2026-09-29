@@ -39,5 +39,11 @@ jobs:
         run: |
           bash desktop/test-blacklist-merge.sh
           bash desktop/test-uninstall-restore.sh
+          # The installer refuses root, so a root container runs it as nobody.
+          if [ "$(id -u)" = 0 ]; then
+            setpriv --reuid=65534 --regid=65534 --clear-groups bash desktop/test-install-desktop.sh
+          else
+            bash desktop/test-install-desktop.sh
+          fi
       - name: Shell scripts
         run: shellcheck -S warning install.sh uninstall.sh desktop/*.sh
