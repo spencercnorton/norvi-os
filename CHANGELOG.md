@@ -2,6 +2,13 @@
 
 All notable changes to NorviOS are documented here.
 
+## Unreleased
+
+- CI parses both stylesheets with the real GTK 3 and GTK 4 parsers. A broken
+  rule does not stop an app; GTK skips it silently. The check proves it fails
+  on a broken rule in either file, and CI now runs on the supported Ubuntu
+  26.04.
+
 ## 1.3.6 — 2026-09-27
 
 - Establish GitHub pull requests as the development workflow, with privacy checks.

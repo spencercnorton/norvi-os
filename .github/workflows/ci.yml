@@ -1,6 +1,7 @@
-# Checks on every pull request and on main: the glass alpha keeps primary text
-# above WCAG AA, the desktop installer's dconf-list surgery and its uninstall
-# rules hold, and the shell scripts are clean. The installers themselves change
+# Checks on every pull request and on main, on the supported Ubuntu 26.04: the
+# glass alpha keeps primary text above WCAG AA, both stylesheets parse with the
+# real GTK 3 and GTK 4 parsers, the desktop installer's dconf-list surgery and
+# its uninstall rules hold, and the shell scripts are clean. The installers change
 # boot and login configuration, so they are exercised on a virtual machine
 # before a release, not here. No secrets, read-only token, GitHub-owned actions
 # pinned by commit.
@@ -14,22 +15,29 @@ permissions:
   contents: read
 jobs:
   checks:
+    container: ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       DEBIAN_FRONTEND: noninteractive
     steps:
+      - name: Container prerequisites
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends git ca-certificates python3 \
+            python3-gi gir1.2-gtk-3.0 gir1.2-gtk-4.0 shellcheck
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Contrast
         run: python3 desktop/check_contrast.py
+      - name: GTK stylesheets parse
+        run: |
+          python3 desktop/check_gtk_css.py
+          bash desktop/test-gtk-css-check.sh
       - name: Desktop installer rules
         run: |
           bash desktop/test-blacklist-merge.sh
           bash desktop/test-uninstall-restore.sh
       - name: Shell scripts
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq shellcheck
-          shellcheck -S warning install.sh uninstall.sh desktop/*.sh
+        run: shellcheck -S warning install.sh uninstall.sh desktop/*.sh

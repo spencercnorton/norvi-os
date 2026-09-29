@@ -189,6 +189,8 @@ Nothing leaves the machine: neither installer uses the network.
 
 ```bash
 python3 desktop/check_contrast.py              # what CI runs: the glass keeps text above WCAG AA
+python3 desktop/check_gtk_css.py               # both stylesheets parse with the real GTK 3 and GTK 4
+bash desktop/test-gtk-css-check.sh
 bash desktop/test-blacklist-merge.sh
 bash desktop/test-uninstall-restore.sh
 shellcheck -S warning install.sh uninstall.sh desktop/*.sh
