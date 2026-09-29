@@ -48,6 +48,35 @@ def worst(alpha):
     return min(out)
 
 
+# Menus are one dark plate in light and dark style alike, under white text, and
+# GTK draws no blur behind them, so the plate's alpha alone keeps the labels
+# readable on a white wallpaper (the Shell's .22 token would give 1.5:1). A
+# hovered item adds a white wash. Worked on 50, the plate's lightest channel,
+# so the estimate errs toward less contrast.
+PLATE = r"background-color:\s*rgba\(45,\s*45,\s*50,\s*([\d.]+)\)"
+WASH = r":hover\s*\{[^}]*background-color:\s*rgba\(255,\s*255,\s*255,\s*([\d.]+)\)"
+
+
+def menu_worst(plate, wash):
+    out = []
+    for name, back in BACKDROPS.items():
+        surface = plate * 50 + (1 - plate) * back
+        for state, s in (("menu", surface), ("hovered item", wash * 255 + (1 - wash) * surface)):
+            out.append((contrast(s, 255), state, name))
+    return min(out)
+
+
+def menus_from_stylesheets():
+    """(lowest plate alpha, strongest hover wash) per stylesheet."""
+    out = {}
+    for name in STYLESHEETS:
+        css = re.sub(r"/\*.*?\*/", "", (pathlib.Path(__file__).parent / name).read_text(), flags=re.S)
+        plates, washes = re.findall(PLATE, css), re.findall(WASH, css)
+        assert plates and washes, f"no menu plate or hover wash found in {name}"
+        out[name] = (min(map(float, plates)), max(map(float, washes)))
+    return out
+
+
 def alphas_from_stylesheets():
     """Every window-glass alpha in the layer, keyed by stylesheet."""
     out = {}
@@ -84,6 +113,11 @@ if __name__ == "__main__":
         c, scheme, back = worst(alphas[name])
         assert c >= AA, (f"{name} alpha {alphas[name]} gives {c:.2f}:1 in {scheme} "
                          f"on {back} — below AA {AA}")
+    for name, (plate, wash) in sorted(menus_from_stylesheets().items()):
+        c, state, back = menu_worst(plate, wash)
+        print(f"  {name:9s} menu plate {plate:.2f}  worst {c:5.2f}:1"
+              f"  ({state}, {back} backdrop)  {'PASS' if c >= AA else 'FAIL'}")
+        assert c >= AA, (f"{name} menu plate {plate} gives {c:.2f}:1 on {back} — below AA {AA}")
     # floor: the lowest alpha that still passes, to 0.01
     floor = next(a / 100 for a in range(1, 101) if worst(a / 100)[0] >= AA)
     shown = ", ".join(f"{n} {alphas[n]}" for n in sorted(alphas))
