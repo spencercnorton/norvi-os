@@ -79,7 +79,7 @@ extension for one Shell major version works on another.
 
 | Symptom | Check and next action |
 |---|---|
-| Installer refuses the desktop | Check Ubuntu/GNOME versions and Blur my Shell availability. |
+| Installer refuses the desktop | Check Ubuntu/GNOME versions, that Blur my Shell is installed and enabled (`gnome-extensions info blur-my-shell@aunetx` shows `State: ACTIVE`), and that you ran it from inside the desktop session. |
 | Background is translucent but sharp | Confirm blur is enabled; inspect extension compatibility. |
 | Boot branding looks unchanged | Check installer output and reboot into the regenerated kernel image. |
 | User stylesheet already existed | Preserve the pre-install copy; use the uninstall path to restore it. |

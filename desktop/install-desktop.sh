@@ -285,7 +285,11 @@ stale_gtk3() {
 stale="$(stale_gtk3 || true)"
 
 echo
-echo "DONE. GTK4 apps re-read the stylesheet live; the blur applies immediately."
+if [ "$MODE" = "stylesheet-only" ]; then
+  echo "DONE. GTK4 apps re-read the stylesheet live."
+else
+  echo "DONE. GTK4 apps re-read the stylesheet live; the blur applies immediately."
+fi
 if [ -n "$stale" ]; then
   echo
   echo "GTK3 does NOT re-read it. These GTK3 processes are running; any of them"
