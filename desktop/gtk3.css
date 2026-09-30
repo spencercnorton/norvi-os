@@ -121,8 +121,17 @@ menu separator,
  * the overview stays vivid, because DING is not drawn there. DING tags the
  * window in desktopGrid.js:53 (`add_class('desktopwindow')`) so it can be left
  * transparent, and its own stylesheet.css does exactly that -- this file was
- * overriding it at USER priority. */
-window.background:not(.desktopwindow) {
+ * overriding it at USER priority.
+ *
+ * `:not(.popup)` EXCLUDES MENUS. A GtkMenu's toplevel is its own window and
+ * carries ['background', 'csd', 'popup'], so without it this rule matched the
+ * menu's toplevel and, at equal specificity (0,2,1) and later in the file, beat
+ * the `window.popup.background { transparent }` rule above. Measured with a
+ * GtkMenu probe: the plate computed rgba(.173,.173,.173,.720), exactly this
+ * glass, painted as a SQUARE behind the rounded `menu` node, so every GTK3 menu,
+ * the desktop right-click included, got its corners back. A popup is transient
+ * chrome on its own tinted plate and never wants window glass. */
+window.background:not(.desktopwindow):not(.popup) {
     background-color: alpha(@theme_bg_color, 0.72);
 }
 

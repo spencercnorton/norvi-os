@@ -12,6 +12,9 @@ Fixes from a clean-machine run of 1.3.6 on a fresh Ubuntu 26.04 desktop:
 - The desktop installer now refuses when Blur my Shell is installed but not
   running, as the README says. It used to go ahead and leave translucent
   windows over a sharp wallpaper.
+- GTK3 right-click menus, the desktop's included, keep their rounded corners.
+  The window-glass rule also matched a menu's own toplevel window and painted a
+  square glass plate behind it.
 - A window's sidebar turns to glass again when the window loses focus.
   libadwaita 1.9 paints the sidebar on a node the stylesheet did not cover,
   so it stayed solid.
