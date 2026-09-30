@@ -2,7 +2,7 @@
 
 All notable changes to NorviOS are documented here.
 
-## Unreleased
+## 1.3.7 — 2026-09-30
 
 Fixes from a clean-machine run of 1.3.6 on a fresh Ubuntu 26.04 desktop:
 
@@ -33,6 +33,14 @@ Checks:
 - The contrast check covers the right-click menus too. They are one dark
   plate in light and dark style with no blur behind it, so its alpha alone
   keeps the labels readable over a white wallpaper.
+
+Documentation:
+
+- The README links each desktop extension that now has its own public
+  repository and release: XDock, gnome-rounded-blur, Workspace Bar,
+  Transparent Top Bar (Auto), Power Only Quick Settings, Lock Screen Suite and
+  Wallpaper Suite. Blur my Shell is the upstream release, and Workspace Bar
+  replaces Space Bar.
 
 ## 1.3.6 — 2026-09-27
 
