@@ -2,6 +2,38 @@
 
 All notable changes to NorviOS are documented here.
 
+## Unreleased
+
+Fixes from a clean-machine run of 1.3.6 on a fresh Ubuntu 26.04 desktop:
+
+- `install-desktop.sh --uninstall` no longer stops with exit status 1 before
+  finishing when there is no Blur my Shell record to restore: a second
+  uninstall, or one after a `--stylesheet-only` install.
+- The desktop installer now refuses when Blur my Shell is installed but not
+  running, as the README says. It used to go ahead and leave translucent
+  windows over a sharp wallpaper.
+- GTK3 right-click menus, the desktop's included, keep their rounded corners.
+  The window-glass rule also matched a menu's own toplevel window and painted a
+  square glass plate behind it.
+- A window's sidebar turns to glass again when the window loses focus.
+  libadwaita 1.9 paints the sidebar on a node the stylesheet did not cover,
+  so it stayed solid.
+- The desktop installer leaves the permissions of an existing
+  `~/.config/gtk-3.0` alone, and its marker file is no longer executable.
+- `install.sh` checks the initramfs with dracut's `lsinitrd` when
+  `lsinitramfs` is not installed. It used to print a false "watermark not
+  found" warning.
+
+Checks:
+
+- CI parses both stylesheets with the real GTK 3 and GTK 4 parsers. A broken
+  rule does not stop an app; GTK skips it silently. The check proves it fails
+  on a broken rule in either file, and CI now runs on the supported Ubuntu
+  26.04.
+- The contrast check covers the right-click menus too. They are one dark
+  plate in light and dark style with no blur behind it, so its alpha alone
+  keeps the labels readable over a white wallpaper.
+
 ## 1.3.6 — 2026-09-27
 
 - Establish GitHub pull requests as the development workflow, with privacy checks.

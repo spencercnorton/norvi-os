@@ -137,8 +137,10 @@ boot, and Settings shows the new logo the next time it opens.
 The glass needs [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
 installed and enabled first; Ubuntu does not package it. Without it the
 desktop installer stops and says so, rather than leaving translucent windows
-over a sharp wallpaper. `./desktop/install-desktop.sh --stylesheet-only`
-installs the stylesheet on its own if that is what you want.
+over a sharp wallpaper. Run it from a terminal inside your desktop session:
+it asks GNOME Shell whether Blur my Shell is running.
+`./desktop/install-desktop.sh --stylesheet-only` installs the stylesheet on
+its own if that is what you want.
 
 To remove everything:
 
@@ -190,8 +192,11 @@ Nothing leaves the machine: neither installer uses the network.
 
 ```bash
 python3 desktop/check_contrast.py              # what CI runs: the glass keeps text above WCAG AA
+python3 desktop/check_gtk_css.py               # both stylesheets parse with the real GTK 3 and GTK 4
+bash desktop/test-gtk-css-check.sh
 bash desktop/test-blacklist-merge.sh
 bash desktop/test-uninstall-restore.sh
+bash desktop/test-install-desktop.sh           # the real installer, end to end, in a scratch HOME
 shellcheck -S warning install.sh uninstall.sh desktop/*.sh
 ```
 
