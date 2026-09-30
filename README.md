@@ -69,22 +69,23 @@ that, and nothing that was yours.
 
 The screenshots show the whole NorviOS desktop, not just what this repository
 installs. The rest is a set of GNOME Shell extensions, most of them
-NorviTech's own and several of them forks, which are **not published yet**:
-each needs its own licence and code review first. Until then this is what they
-are, so nothing on this page is a mystery.
+NorviTech's own and several of them forks. The ones marked *published* have
+their own repositories and releases. The others are **not published yet**:
+each needs its own licence and code review first. Until then this is what
+they are, so nothing on this page is a mystery.
 
 | On screen | Extension | Origin |
 |---|---|---|
 | The dock, centred at the bottom, blurred, and the app launcher that opens from it, with drawers you create from a right-click | XDock | NorviTech fork of [Dash to Dock](https://github.com/micheleg/dash-to-dock) |
-| The blur behind the dock, menus and windows, with rounded corners | Blur my Shell (Norvi build) and gnome-rounded-blur | Fork of [Blur my Shell](https://github.com/aunetx/blur-my-shell); the rounded-blur library is in the APT repository |
+| The blur behind the dock, menus and windows, with rounded corners | Blur my Shell (Norvi build) and [gnome-rounded-blur](https://github.com/spencercnorton/gnome-rounded-blur) | Fork of [Blur my Shell](https://github.com/aunetx/blur-my-shell); gnome-rounded-blur is the Ubuntu build of [kancko/gnome-rounded-blur](https://github.com/kancko/gnome-rounded-blur), *published* |
 | Named workspaces on the left of the top bar | Space Bar | Fork of [Space Bar](https://github.com/christopher-l/space-bar) |
-| The top bar that turns transparent over the desktop | Transparent Top Bar | Fork of [Transparent Top Bar](https://github.com/lamarios/gnome-shell-extension-transparent-top-bar) |
+| The top bar that turns transparent over the desktop, at an opacity measured from the wallpaper | [Transparent Top Bar (Auto)](https://github.com/spencercnorton/transparent-top-bar) | NorviTech fork of [Transparent Top Bar](https://github.com/lamarios/gnome-shell-extension-transparent-top-bar), *published* |
 | The weather in the top bar and its forecast panel | GEweather | NorviTech fork of [SimpleWeather](https://github.com/romanlefler/SimpleWeather) |
 | The clock on the right of the top bar | Move Clock | [Third-party](https://extensions.gnome.org/extension/2/move-clock/), unchanged |
-| A system menu that shows only the power button | Power-only Quick Settings | NorviTech |
+| A system menu that shows only the power button | [Power Only Quick Settings](https://github.com/spencercnorton/power-only-quicksettings) | NorviTech, *published* |
 | The large clock and weather on the lock screen | Lock Screen Suite | NorviTech |
 | Per-monitor wallpapers and rotation | Wallpaper Suite | NorviTech |
-| Sticky notes that come back where you left them | [XNote](https://github.com/spencercnorton/xnote) and [XNote Placement](https://github.com/spencercnorton/xnote-placement) | NorviTech, published |
+| Sticky notes that come back where you left them | [XNote](https://github.com/spencercnorton/xnote) and [XNote Placement](https://github.com/spencercnorton/xnote-placement) | NorviTech, *published* |
 
 <p align="center">
   <img alt="The dock's app launcher: clicking the first dock button opens a panel with the user's name, a search field and recently used apps; All Apps fills the grid, and typing note narrows it to XNote and Text Editor before the panel closes." src="docs/screenshots/launcher.png" width="900">
