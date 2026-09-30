@@ -47,8 +47,12 @@ echo "== rebuilding initramfs for all installed kernels (~1 min)"
 # build, but existing kernels' initrds must be rebuilt now to pick up the theme.
 update-initramfs -u -k all
 NEWEST_INITRD="$(ls -1v /boot/initrd.img-* | tail -1)"
+# 26.04 builds initrds with dracut (lsinitrd); lsinitramfs exists only if
+# initramfs-tools-core happens to be installed, so a missing lister is not a
+# missing watermark.
+list_initrd() { if command -v lsinitramfs >/dev/null; then lsinitramfs "$1"; else lsinitrd "$1"; fi; }
 # No -q: grep -q closes the pipe early -> SIGPIPE/pipefail marks a healthy run failed.
-if lsinitramfs "$NEWEST_INITRD" | grep -F "norvitech/watermark.png" >/dev/null; then
+if list_initrd "$NEWEST_INITRD" | grep -F "norvitech/watermark.png" >/dev/null; then
   echo "OK: NorviTech watermark baked into $NEWEST_INITRD"
 else
   echo "WARNING: watermark not found in $NEWEST_INITRD — boot splash may still be stock" >&2
@@ -80,7 +84,7 @@ set_greeter_logo() {
 }
 set_greeter_logo
 /usr/share/gdm/generate-config
-if strings /var/lib/gdm3/greeter-dconf-defaults | grep -q norvitech-gdm-logo; then
+if strings /var/lib/gdm3/greeter-dconf-defaults | grep norvitech-gdm-logo >/dev/null; then
   echo "OK: greeter dconf db carries the NorviTech logo"
 else
   echo "WARNING: greeter db missing the logo key" >&2

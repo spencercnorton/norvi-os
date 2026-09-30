@@ -43,7 +43,7 @@ bms_blacklist_add() {
 }
 
 bms_blacklist_remove() {
-  [ -d "$BMS/schemas" ] || return
+  [ -d "$BMS/schemas" ] || return 0
   local cur out first item
   cur=$(GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings get "$APPS" blacklist)
   case "$cur" in "@as []"|"[]") return ;; esac
@@ -121,7 +121,7 @@ else echo "FAIL - an entry we added was not recorded"; fail=1; fi
 # may well have had on, and never restored dynamic-opacity at all.
 
 bms_record_original() {
-  [ -d "$BMS/schemas" ] || return
+  [ -d "$BMS/schemas" ] || return 0
   install -d "$STATE_DIR"
   local k
   {
@@ -135,11 +135,11 @@ bms_record_original() {
 }
 
 bms_restore_original() {
-  [ -d "$BMS/schemas" ] || return
-  [ -f "$BMS_BEFORE" ] || return
+  [ -d "$BMS/schemas" ] || return 0
+  [ -f "$BMS_BEFORE" ] || return 0
   local k v
   while IFS='=' read -r k v; do
-    [ -n "$k" ] && GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings set "$APPS" "$k" "$v"
+    [ -z "$k" ] || GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings set "$APPS" "$k" "$v"
   done < "$BMS_BEFORE"
   rm -f "$BMS_BEFORE"
 }

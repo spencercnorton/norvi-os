@@ -35,6 +35,7 @@ python3 desktop/check_gtk_css.py               # both stylesheets parse with the
 bash desktop/test-gtk-css-check.sh
 bash desktop/test-blacklist-merge.sh
 bash desktop/test-uninstall-restore.sh
+bash desktop/test-install-desktop.sh
 shellcheck -S warning install.sh uninstall.sh desktop/*.sh   # lint; CI enforces it
 ```
 

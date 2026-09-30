@@ -241,3 +241,11 @@ window.background.csd {
 .navigation-sidebar:backdrop {
     background-color: transparent;
 }
+
+/* libadwaita 1.9 paints a split view's sidebar on `.sidebar-pane`, behind
+ * `.sidebar`, so without this the sidebar stayed solid in backdrop too.
+ * Measured on GNOME 50 in Files and Settings: flat grey 240 unfocused before,
+ * wallpaper-tinted glass after; focused it stays solid either way. */
+.sidebar-pane:backdrop {
+    background-color: transparent;
+}

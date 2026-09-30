@@ -26,6 +26,10 @@ bms() {
   GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings set "$APPS" "$1" "$2"
 }
 
+# Every guard below says `return 0`: a bare `return` after a failed test returns
+# that test's 1, and under `set -e` the caller then aborts. That turned a second
+# --uninstall, or one after --stylesheet-only, into a silent exit 1.
+#
 # These four keys are the USER's settings too. Each is recorded once, before
 # this installer first changes it, so uninstall can put back what was actually
 # there rather than assuming a default. A key already in the record is never
@@ -36,7 +40,7 @@ bms() {
 # touched the compositor at all -- after a --stylesheet-only install it does not
 # exist, and uninstall leaves dconf alone.
 bms_record_original() {
-  [ -d "$BMS/schemas" ] || return
+  [ -d "$BMS/schemas" ] || return 0
   install -d "$STATE_DIR"
   local k
   {
@@ -50,11 +54,11 @@ bms_record_original() {
 }
 
 bms_restore_original() {
-  [ -d "$BMS/schemas" ] || return
-  [ -f "$BMS_BEFORE" ] || return
+  [ -d "$BMS/schemas" ] || return 0
+  [ -f "$BMS_BEFORE" ] || return 0
   local k v
   while IFS='=' read -r k v; do
-    [ -n "$k" ] && GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings set "$APPS" "$k" "$v"
+    [ -z "$k" ] || GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings set "$APPS" "$k" "$v"
   done < "$BMS_BEFORE"
   rm -f "$BMS_BEFORE"
 }
@@ -81,7 +85,7 @@ bms_blacklist_add() {
 
 # The inverse, and the same rule: string surgery on a list the user co-owns.
 bms_blacklist_remove() {
-  [ -d "$BMS/schemas" ] || return
+  [ -d "$BMS/schemas" ] || return 0
   local cur out first item
   cur=$(GSETTINGS_SCHEMA_DIR="$BMS/schemas" gsettings get "$APPS" blacklist)
   case "$cur" in "@as []"|"[]") return ;; esac
@@ -133,7 +137,7 @@ if [ "$MODE" = "uninstall" ]; then
   if [ -f "$ADDED" ]; then
     if [ -d "$BMS/schemas" ]; then
       while IFS= read -r entry; do
-        [ -n "$entry" ] && bms_blacklist_remove "$entry"
+        [ -z "$entry" ] || bms_blacklist_remove "$entry"
       done < "$ADDED"
       rm -f "$ADDED"
     else
@@ -174,10 +178,29 @@ NOBLUR
   exit 1
 fi
 
+# Installed is not running. A disabled extension leaves the same washed-out
+# desktop the check above prevents, and only GNOME Shell knows its state; outside
+# the desktop session there is no answer, so that refuses too.
+bms_state=$(gnome-extensions info blur-my-shell@aunetx 2>/dev/null || true)
+if [ "$MODE" != "stylesheet-only" ] && [[ "$bms_state" != *"State: ACTIVE"* ]]; then
+  cat >&2 <<'NOTACTIVE'
+blur-my-shell is installed but not running, so the blur half would not apply.
+Enable it (a newly installed extension needs a log-out and back in first), then
+run this again from your desktop session:
+
+    gnome-extensions enable blur-my-shell@aunetx
+
+Or, if you actually want the stylesheet on its own:
+
+    ./install-desktop.sh --stylesheet-only
+NOTACTIVE
+  exit 1
+fi
+
 python3 "$SRC/check_contrast.py" >/dev/null   # refuse to install an inaccessible alpha
 for v in $VERSIONS; do
   d="$CFG/gtk-$v.0/gtk.css"
-  install -d "$(dirname "$d")"
+  mkdir -p "$(dirname "$d")"   # not install -d: that resets an existing dir to 0755
   # Record what was here BEFORE the first managed install, exactly once, and
   # never revisit it. The earlier version only checked for the backup, so on a
   # clean box -- where there was no predecessor and so no backup -- the next
@@ -192,7 +215,7 @@ for v in $VERSIONS; do
       cp -a "$d" "$d.pre-norvi"
       echo "  kept previous stylesheet as $d.pre-norvi"
     else
-      install -D /dev/null "$d.norvi-absent-before"
+      : > "$d.norvi-absent-before"
     fi
   fi
   install -m644 "$SRC/gtk$v.css" "$d"
@@ -262,7 +285,11 @@ stale_gtk3() {
 stale="$(stale_gtk3 || true)"
 
 echo
-echo "DONE. GTK4 apps re-read the stylesheet live; the blur applies immediately."
+if [ "$MODE" = "stylesheet-only" ]; then
+  echo "DONE. GTK4 apps re-read the stylesheet live."
+else
+  echo "DONE. GTK4 apps re-read the stylesheet live; the blur applies immediately."
+fi
 if [ -n "$stale" ]; then
   echo
   echo "GTK3 does NOT re-read it. These GTK3 processes are running; any of them"
