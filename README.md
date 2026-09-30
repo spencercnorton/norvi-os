@@ -84,7 +84,7 @@ they are, so nothing on this page is a mystery.
 | The clock on the right of the top bar | Move Clock | [Third-party](https://extensions.gnome.org/extension/2/move-clock/), unchanged |
 | A system menu that shows only the power button | [Power Only Quick Settings](https://github.com/spencercnorton/power-only-quicksettings) | NorviTech, *published* |
 | The large clock and weather on the lock screen | Lock Screen Suite | NorviTech |
-| Per-monitor wallpapers and rotation | Wallpaper Suite | NorviTech |
+| Per-monitor wallpapers and rotation | [Wallpaper Suite](https://github.com/spencercnorton/wallpaper-suite) | NorviTech, *published* |
 | Sticky notes that come back where you left them | [XNote](https://github.com/spencercnorton/xnote) and [XNote Placement](https://github.com/spencercnorton/xnote-placement) | NorviTech, *published* |
 
 <p align="center">
