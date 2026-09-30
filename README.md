@@ -83,7 +83,7 @@ they are, so nothing on this page is a mystery.
 | The weather in the top bar and its forecast panel | GEweather | NorviTech fork of [SimpleWeather](https://github.com/romanlefler/SimpleWeather) |
 | The clock on the right of the top bar | Move Clock | [Third-party](https://extensions.gnome.org/extension/2/move-clock/), unchanged |
 | A system menu that shows only the power button | [Power Only Quick Settings](https://github.com/spencercnorton/power-only-quicksettings) | NorviTech, *published* |
-| The large clock and weather on the lock screen | Lock Screen Suite | NorviTech |
+| The large clock and weather on the lock screen | [Lock Screen Suite](https://github.com/spencercnorton/lock-screen-suite) | NorviTech, *published* |
 | Per-monitor wallpapers and rotation | [Wallpaper Suite](https://github.com/spencercnorton/wallpaper-suite) | NorviTech, *published* |
 | Sticky notes that come back where you left them | [XNote](https://github.com/spencercnorton/xnote) and [XNote Placement](https://github.com/spencercnorton/xnote-placement) | NorviTech, *published* |
 
