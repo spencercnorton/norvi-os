@@ -76,7 +76,7 @@ they are, so nothing on this page is a mystery.
 
 | On screen | Extension | Origin |
 |---|---|---|
-| The dock, centred at the bottom, blurred, and the app launcher that opens from it, with drawers you create from a right-click | XDock | NorviTech fork of [Dash to Dock](https://github.com/micheleg/dash-to-dock) |
+| The dock, centred at the bottom, blurred, and the app launcher that opens from it, with drawers you create from a right-click | [XDock](https://github.com/spencercnorton/xdock) | NorviTech fork of [Dash to Dock](https://github.com/micheleg/dash-to-dock), *published* |
 | The blur behind menus and windows, with rounded corners | [Blur my Shell](https://github.com/aunetx/blur-my-shell) and [gnome-rounded-blur](https://github.com/spencercnorton/gnome-rounded-blur) | Blur my Shell as upstream releases it (blurred menus need v73 or later); gnome-rounded-blur is the Ubuntu build of [kancko/gnome-rounded-blur](https://github.com/kancko/gnome-rounded-blur), *published* |
 | Named workspaces on the left of the top bar | [Workspace Bar](https://github.com/spencercnorton/workspace-bar) | NorviTech, *published* |
 | The top bar that turns transparent over the desktop, at an opacity measured from the wallpaper | [Transparent Top Bar (Auto)](https://github.com/spencercnorton/transparent-top-bar) | NorviTech fork of [Transparent Top Bar](https://github.com/lamarios/gnome-shell-extension-transparent-top-bar), *published* |
