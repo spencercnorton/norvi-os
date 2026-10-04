@@ -20,7 +20,7 @@
  *   surfaces.dark_menu    rgb(45 45 50 / .22)  <- specified OVER DYNAMIC BLUR
  *   surfaces.shadow_menu  0 8px 24px rgb(0 0 0 / .16)
  *
- * ponytail: alpha raised .22 -> .88. GTK has no backdrop-filter and Mutter does
+ * Alpha raised .22 -> .88. GTK has no backdrop-filter and Mutter does
  * not expose backdrop blur for client windows, so there is no blur behind a GTK
  * menu -- at .22 the raw wallpaper reads straight through the labels. .88 keeps
  * the tint and a hint of translucency while staying legible. If GTK ever gains
@@ -105,7 +105,7 @@ menu separator,
  * paint these surfaces with a gradient, which a background-color alone leaves
  * sitting on top.
  *
- * ponytail: `.toolbar` is a broad selector — GTK3 also uses it for inline
+ * Known gap: `.toolbar` is a broad selector — GTK3 also uses it for inline
  * toolbars inside file choosers and sidebars, which will show their parent's
  * fill rather than the desktop. Same colour family, cosmetic. Narrow it if one
  * ever looks wrong.
@@ -341,7 +341,7 @@ menubar, toolbar, .toolbar {
  * No new alpha over text: these are chrome, and the labels on them sit on the
  * same 0.72 band check_contrast.py already governs.
  *
- * ponytail: scoped to `.nemo-window` so this cannot reach a GTK3 app that looks
+ * Deliberately scoped to `.nemo-window` so this cannot reach a GTK3 app that looks
  * fine. Widen it if a second GTK3 app shows the same slabs.
  */
 .nemo-window toolbar button,
