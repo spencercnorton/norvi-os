@@ -1,7 +1,8 @@
 # Checks on every pull request and on main, on the supported Ubuntu 26.04: the
 # glass alpha keeps primary text above WCAG AA, both stylesheets parse with the
 # real GTK 3 and GTK 4 parsers, the desktop installer's dconf-list surgery and
-# its uninstall rules hold, and the shell scripts are clean. The installers change
+# its uninstall rules hold, the shell scripts are clean, and the norvi-os
+# metapackage builds twice byte for byte. The installers change
 # boot and login configuration, so they are exercised on a virtual machine
 # before a release, not here. No secrets, read-only token, GitHub-owned actions
 # pinned by commit.
@@ -25,7 +26,7 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y -qq --no-install-recommends git ca-certificates python3 \
-            python3-gi gir1.2-gtk-3.0 gir1.2-gtk-4.0 shellcheck
+            python3-gi gir1.2-gtk-3.0 gir1.2-gtk-4.0 shellcheck build-essential debhelper dpkg-dev
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -46,4 +47,21 @@ jobs:
             bash desktop/test-install-desktop.sh
           fi
       - name: Shell scripts
-        run: shellcheck -S warning install.sh uninstall.sh desktop/*.sh
+        run: shellcheck -S warning install.sh uninstall.sh desktop/*.sh scripts/build.sh
+      - name: Build the package twice and compare
+        run: |
+          git config --system --add safe.directory "$GITHUB_WORKSPACE"
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          export SOURCE_DATE_EPOCH
+          scripts/build.sh /tmp/one
+          scripts/build.sh /tmp/two
+          for f in /tmp/one/*; do cmp "$f" "/tmp/two/$(basename "$f")"; done
+          mkdir -p dist/deb
+          cp /tmp/one/*.deb dist/deb/
+          (cd dist/deb && sha256sum -- *.deb > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: norvi-os-debian-candidate
+          path: dist/deb/
+          if-no-files-found: error
+          retention-days: 14

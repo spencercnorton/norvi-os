@@ -1,0 +1,44 @@
+Source: norvi-os
+Section: metapackages
+Priority: optional
+Maintainer: NorviTech <apt@globalentry.systems>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Homepage: https://norvitech.com/norvi-os/
+Vcs-Browser: https://github.com/spencercnorton/norvi-os
+Vcs-Git: https://github.com/spencercnorton/norvi-os.git
+Rules-Requires-Root: no
+
+Package: norvi-os
+Architecture: all
+Depends:
+ ${misc:Depends},
+ norvi-archive-keyring
+Recommends:
+ gnome-rounded-blur,
+ gnome-shell-extension-lock-screen-suite,
+ gnome-shell-extension-power-only-quicksettings,
+ gnome-shell-extension-transparent-top-bar,
+ gnome-shell-extension-workspace-bar,
+ gnome-shell-extension-xdock,
+ wallpaper-suite,
+ xnote,
+ gnome-shell-extension-xnote-placement,
+ snipsnap,
+ timecrate-gui
+Suggests:
+ helios
+Description: NorviOS desktop components and apps for Ubuntu
+ Installs the NorviOS desktop for GNOME 50 on Ubuntu 26.04 from the NorviTech
+ APT repository: the dock, the workspace bar, the transparent top bar, rounded
+ blur, the power-only system menu, the lock screen and wallpaper extensions,
+ XNote sticky notes with their placement extension, SnipSnap screenshots and
+ the Timecrate backup app.
+ .
+ The components are recommended rather than required, so any one of them can
+ be removed without removing this package, and no version is pinned: each
+ component updates on its own. It depends on norvi-archive-keyring, which
+ keeps the repository source and its signing key current.
+ .
+ The boot, login screen and window-glass styling are installed separately,
+ from the NorviOS source; the homepage shows how.

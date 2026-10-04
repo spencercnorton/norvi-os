@@ -2,6 +2,23 @@
 
 All notable changes to NorviOS are documented here.
 
+## 1.4.0 — 2026-10-04
+
+- New `norvi-os` Debian package, a metapackage in the NorviTech APT
+  repository. It depends on `norvi-archive-keyring` and recommends the
+  desktop components and apps: gnome-rounded-blur, Lock Screen Suite, Power
+  Only Quick Settings, Transparent Top Bar (Auto), Workspace Bar, XDock,
+  Wallpaper Suite, XNote, XNote Placement, SnipSnap and the Timecrate app. It
+  suggests Helios. No version is pinned, so each component updates on its own
+  and any one of them can be removed without removing the rest.
+- The install is three steps: run the repository's `setup.sh`,
+  `sudo apt install norvi-os`, and install Blur my Shell v73 from its upstream
+  release, checked against the release's SHA-256. The branding and the window
+  glass still install from source with `install.sh` and
+  `desktop/install-desktop.sh`.
+- Each release now carries the `.deb` beside the source archive and the
+  checksums. CI builds the package twice and compares the bytes.
+
 ## 1.3.7 — 2026-09-30
 
 Fixes from a clean-machine run of 1.3.6 on a fresh Ubuntu 26.04 desktop:

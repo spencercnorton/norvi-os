@@ -2,7 +2,9 @@
 
 NorviOS is a reversible branding and glass-style layer for Ubuntu, rather
 than a separate distribution. The screenshots show a wider desktop suite;
-this repository does not install every extension pictured.
+the `norvi-os` package installs most of the extensions pictured (the README's
+table says which are published), and this repository's installers add the
+branding and the window glass.
 
 ## Supported environment
 
@@ -19,6 +21,26 @@ df -h /boot
 
 ## Install and configure
 
+The desktop components and apps install from the NorviTech APT repository,
+in three steps:
+
+```bash
+curl -fsSL https://apt.norvitech.com/setup.sh | sudo sh   # checks the key fingerprint, installs norvi-archive-keyring
+sudo apt install norvi-os                                  # the metapackage: components and apps as Recommends
+curl -fsSLo blur-my-shell.zip https://github.com/aunetx/blur-my-shell/releases/download/v73/blur-my-shell%40aunetx.shell-extension.zip
+echo '237a59e04b3cffd3fb86aa3cd18b32f929c61e2af8dcc781379364a59d53b129  blur-my-shell.zip' | sha256sum --check
+gnome-extensions install --force blur-my-shell.zip         # Blur my Shell v73, the upstream release
+```
+
+`norvi-os` pins no versions: each component updates on its own through apt
+and unattended-upgrades, and any one of them can be removed without removing
+the metapackage. Blur my Shell is a per-user install from its upstream
+release, pinned by checksum; repeat the last three commands with a newer
+release and its checksum to update it. Log out and back in once, then enable
+the extensions (the README lists the command).
+
+The branding and the window glass install from this repository:
+
 ```bash
 git clone https://github.com/spencercnorton/norvi-os.git
 cd norvi-os
@@ -31,9 +53,9 @@ The first command installs Plymouth, the greeter logo and About-panel logos.
 It updates boot files and needs sudo. The desktop command changes only your
 user's GTK styles and blur settings; run it without sudo.
 
-Install and enable a compatible Blur my Shell first. Without it the desktop
-installer refuses to make windows translucent. `--stylesheet-only` is an
-explicit alternative when you manage blur separately.
+Enable Blur my Shell first. Without it the desktop installer refuses to make
+windows translucent. `--stylesheet-only` is an explicit alternative when you
+manage blur separately.
 
 ![NorviOS with a demo account and synthetic notes](screenshots/desktop.png)
 
@@ -71,6 +93,8 @@ sudo ./uninstall.sh
 ```
 
 These restore the original branding and the user's recorded desktop settings.
+`sudo apt remove norvi-os` removes the metapackage; `sudo apt autoremove` then
+removes the components it pulled in.
 Check About, GTK styles and the next boot again after rollback. Before a major
 Ubuntu or GNOME upgrade, verify compatibility in a fresh VM. Do not assume an
 extension for one Shell major version works on another.
