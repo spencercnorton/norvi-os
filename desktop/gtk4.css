@@ -43,7 +43,7 @@
  * same shadow, with a documented reason for the alpha difference — not pixel
  * equality with the Shell popups.
  *
- * ponytail: if GTK ever gains a blurred-backdrop path, drop this to the .22
+ * If GTK ever gains a blurred-backdrop path, drop this to the .22
  * token and delete this paragraph.
  *
  * SCOPE
@@ -192,7 +192,7 @@ popover contents modelbutton:focus-visible {
  * decorations — and an undecorated window is an overlay, which should not be
  * glass anyway.
  *
- * ponytail: the GTK3 file carries the same unscoped rule and the same exposure
+ * Known gap: the GTK3 file carries the same unscoped rule and the same exposure
  * (VS Code maps libgtk-3), but is deliberately left alone — nobody has reported
  * it, VS Code draws its own menus, and GTK3 traditional apps on X11 really are
  * server-decorated, so `.csd` there would silently drop glass on them.
