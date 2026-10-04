@@ -1,0 +1,6 @@
+dist/
+debian/.debhelper/
+debian/files
+debian/norvi-os/
+debian/*.substvars
+debian/debhelper-build-stamp

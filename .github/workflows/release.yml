@@ -35,14 +35,20 @@ jobs:
         run: |
           printf '%s\n' "$RELEASE_TAG" | grep -Eq '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
           git merge-base --is-ancestor HEAD origin/main
+          test "$RELEASE_TAG" = "v$(sed -n '1s/^norvi-os (\([^)]*\)).*/\1/p' debian/changelog)"
           grep -q "^## ${RELEASE_TAG#v} — " CHANGELOG.md
       - name: Create release asset directory
         run: mkdir -p release-assets
-      - name: Package the exact public source
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: norvi-os-debian-candidate
+          path: release-assets
+      - name: Package the exact public source and checksum everything
         run: |
+          rm release-assets/SHA256SUMS.txt
           git archive --format=tar.gz --prefix=source/ HEAD > release-assets/source.tar.gz
           cd release-assets
-          sha256sum * > SHA256SUMS.txt
+          sha256sum -- * > SHA256SUMS.txt
       - name: Publish immutable release artifacts
         run: |
           gh release create "$RELEASE_TAG" release-assets/* \

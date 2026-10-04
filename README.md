@@ -9,7 +9,7 @@
   <a href="https://norvitech.com"><img alt="NorviTech Suite" src="https://img.shields.io/badge/NorviTech-Suite-FD8024.svg"></a>
   <a href="https://github.com/spencercnorton/norvi-os/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/spencercnorton/norvi-os/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/spencercnorton/norvi-os/tags"><img alt="Latest release" src="https://img.shields.io/github/v/tag/spencercnorton/norvi-os?label=release&sort=semver"></a>
-  <a href="#install"><img alt="Build from source" src="https://img.shields.io/badge/install-from%20source-2D2D2D.svg"></a>
+  <a href="#install"><img alt="Install with APT" src="https://img.shields.io/badge/install-APT-2D2D2D.svg"></a>
   <a href="LICENSE"><img alt="Licence" src="https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg"></a>
   <a href="https://buy.stripe.com/8x26oH2U44f65TRe574wM04"><img alt="Donate" src="https://img.shields.io/badge/donate-Stripe-635bff.svg?logo=stripe&logoColor=white"></a>
 </p>
@@ -121,7 +121,56 @@ repository:
 
 ## Install
 
-### Ubuntu 26.04 — from source
+### Ubuntu 26.04 — the desktop, in three steps
+
+1. Add the NorviTech APT repository. The script checks the archive's signing
+   key against its published fingerprint and installs `norvi-archive-keyring`,
+   which keeps the repository source and key current from then on:
+
+   ```bash
+   curl -fsSL https://apt.norvitech.com/setup.sh | sudo sh
+   ```
+
+2. Install NorviOS:
+
+   ```bash
+   sudo apt install norvi-os
+   ```
+
+   `norvi-os` is a metapackage. It recommends the desktop components and apps —
+   XDock, gnome-rounded-blur, Workspace Bar, Transparent Top Bar (Auto), Power
+   Only Quick Settings, Lock Screen Suite, Wallpaper Suite, XNote with XNote
+   Placement, SnipSnap and Timecrate — and suggests Helios. It pins no
+   versions, so each component updates on its own, and you can remove any one
+   of them without removing the rest.
+
+3. Install [Blur my Shell](https://github.com/aunetx/blur-my-shell) v73 from
+   its upstream release, checked against the release's SHA-256.
+   extensions.gnome.org still offers v72 for GNOME 50, and blurred menus need
+   v73:
+
+   ```bash
+   curl -fsSLo blur-my-shell.zip https://github.com/aunetx/blur-my-shell/releases/download/v73/blur-my-shell%40aunetx.shell-extension.zip
+   echo '237a59e04b3cffd3fb86aa3cd18b32f929c61e2af8dcc781379364a59d53b129  blur-my-shell.zip' | sha256sum --check
+   gnome-extensions install --force blur-my-shell.zip
+   ```
+
+Then log out and back in once, so GNOME Shell sees the new extensions, and
+turn them on:
+
+```bash
+for uuid in blur-my-shell@aunetx xdock@spencercnorton.github.io \
+    workspace-bar@spencercnorton.github.io transparent-top-bar@spencercnorton.github.io \
+    power-only-quicksettings@spencercnorton.github.io lock-screen-suite@spencercnorton.github.io \
+    wallpaper-suite@spencercnorton.github.io xnote-placement@spencercnorton.github.io; do
+  gnome-extensions enable "$uuid"
+done
+```
+
+### The boot splash, login screen and window glass — from source
+
+The branding and the glass are not packaged yet. Install them from this
+repository:
 
 ```bash
 git clone https://github.com/spencercnorton/norvi-os.git
@@ -134,11 +183,10 @@ sudo ./install.sh              # boot splash, login screen and About logo, from 
 Nothing restarts; the boot splash and the login screen change from the next
 boot, and Settings shows the new logo the next time it opens.
 
-The glass needs [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
-installed and enabled first; Ubuntu does not package it. Without it the
-desktop installer stops and says so, rather than leaving translucent windows
-over a sharp wallpaper. Run it from a terminal inside your desktop session:
-it asks GNOME Shell whether Blur my Shell is running.
+The glass needs Blur my Shell installed and enabled first (step 3 above).
+Without it the desktop installer stops and says so, rather than leaving
+translucent windows over a sharp wallpaper. Run it from a terminal inside your
+desktop session: it asks GNOME Shell whether Blur my Shell is running.
 `./desktop/install-desktop.sh --stylesheet-only` installs the stylesheet on
 its own if that is what you want.
 
@@ -147,12 +195,10 @@ To remove everything:
 ```bash
 sudo ./uninstall.sh
 ./desktop/install-desktop.sh --uninstall
+sudo apt remove norvi-os       # then sudo apt autoremove takes the components it pulled in
 ```
 
-There is no package yet. NorviOS is not in
-[the APT repository](https://github.com/spencercnorton/helios#install) that
-serves the NorviTech apps, and it has only been tested on Ubuntu 26.04 LTS
-with GNOME 50 on Wayland.
+NorviOS has only been tested on Ubuntu 26.04 LTS with GNOME 50 on Wayland.
 
 ## Documentation
 
@@ -197,7 +243,8 @@ bash desktop/test-gtk-css-check.sh
 bash desktop/test-blacklist-merge.sh
 bash desktop/test-uninstall-restore.sh
 bash desktop/test-install-desktop.sh           # the real installer, end to end, in a scratch HOME
-shellcheck -S warning install.sh uninstall.sh desktop/*.sh
+shellcheck -S warning install.sh uninstall.sh desktop/*.sh scripts/build.sh
+scripts/build.sh                               # the norvi-os .deb into dist/; needs debhelper and dpkg-dev
 ```
 
 The installers change boot and login configuration, so they are run on a
